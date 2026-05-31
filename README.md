@@ -1,2 +1,3 @@
-SemCAS is THE CAS if you want sympy but simple, for now only dutch is supported but english is on the table.
-It runs on Python and SymPy, in the .md file you can see how it works with which command and such
+SemCAS is THE CAS if you want sympy but simple, it works with more human language.
+English and Dutch (My native language) are supported as of now.
+It runs on Python and SymPy, in the .md file with comes in the .zip file you can see how it works with which commands and such
