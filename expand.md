@@ -1,145 +1,141 @@
 SemCAS Expansion Guide
 ======================
 
-Goal:
------
-This file explains how to add ANY new feature to SemCAS
-without breaking existing code. Think “plug-in style”, not
-“rewrite the core”.
+Purpose
+-------
+This document explains how to add ANY new feature to SemCAS.
+SemCAS is modular, safe to extend, and designed so contributors
+can add features without breaking anything.
 
-Core ideas:
------------
-1. Every feature lives in its own function.
-2. The main parser (SemCAS(...)) only routes.
-3. You NEVER have to delete or rewrite old code to add new stuff.
+------------------------------------------------------------
+1. Core Principles
+------------------------------------------------------------
+- Every feature lives in its own function.
+- The main parser only routes input.
+- No feature depends on another feature.
+- You NEVER rewrite old code to add new code.
+- Everything returns strings, not raw objects.
 
-Step 1 — Find the right place
------------------------------
-Open the main SemCAS file and locate these parts:
+------------------------------------------------------------
+2. How to ADD a new feature
+------------------------------------------------------------
 
-- The helper section (expr, pretty, etc.)
-- The feature functions (doe_diff, doe_simpel, doe_pyth, etc.)
-- The main parser:  def SemCAS(z):
-
-You will add:
-- Your new function near the other feature functions.
-- A new parser rule inside SemCAS(z).
-
-Step 2 — Create a new feature function
---------------------------------------
-Example: you want to add a new command called "demo".
-
-Add this somewhere near the other CAS functions:
+STEP A — Create a new function
+------------------------------
+Example: adding a command called "demo".
 
     def doe_demo(s):
-        # s is a string with the user input AFTER the keyword
-        # 1. Parse the expression if needed:
-        #    e = expr(s)
-        # 2. Do your logic:
-        #    result = <whatever you want>
-        # 3. Return a string (SemCAS always returns strings):
-        return "Demo result: " + s
+        # s = the user input AFTER the keyword
+        # parse if needed:
+        #   e = expr(s)
+        # do your logic:
+        result = "Demo result: " + s
+        return result   # ALWAYS return a string
 
 Rules:
-- Input: usually a string (the rest of the user command).
-- Output: ALWAYS a string (no raw SymPy objects).
-- Use existing helpers like expr(...) and pretty(...) if needed.
+- No print()
+- No input()
+- No global state changes
+- Keep it simple and modular
 
-Step 3 — Add a parser rule
+STEP B — Add a parser rule
 --------------------------
-Inside the SemCAS(z) function, you will see a lot of:
-
-    if zl.startswith("..."):
-        ...
-
-Here:
-- z  = original user input (with original casing)
-- zl = lowercased version of z
-
-To connect your new feature, add something like:
+Inside SemCAS(z):
 
     if zl.startswith("demo "):
-        # everything after "demo " is passed to your function
         return doe_demo(z[5:].strip())
 
-Explanation:
-- "demo " is 5 characters, so we slice z[5:].
-- We use z (not zl) so we keep original casing for math.
-- strip() removes extra spaces.
+Rules:
+- zl = lowercase version for detection
+- z  = original version for math
+- slice correctly ("demo " is 5 chars)
+- strip() recommended
 
-Step 4 — Test your new command
-------------------------------
-Run SemCAS and type:
+STEP C — Test it
+----------------
+Now type the command that activates your function.
+
+Example:
 
     demo hello world
 
-You should see:
+If it works and returns your output:
+Congratulations — you added a new SemCAS feature.
 
-    Demo result: hello world
+------------------------------------------------------------
+3. Adding a new “leg ... uit” explanation module
+------------------------------------------------------------
 
-If your feature uses math, for example:
-
-    demo x^2 + 3x + 2
-
-You can do inside doe_demo:
-
-    e = expr(s)
-    # do something with e
-    return pretty(e)
-
-Step 5 — Keep it modular
-------------------------
-When adding new features, follow these rules:
-
-- One feature = one function.
-- Do NOT mix multiple features into one giant function.
-- Do NOT modify existing features unless you are fixing a bug.
-- Add new parser rules instead of changing old ones.
-
-Good patterns:
---------------
-- New command word:
-    - Add a new function:  def doe_<name>(...)
-    - Add a new parser rule:  if zl.startswith("<name> "): ...
-
-- New “explain” module (leg ... uit style):
-    - Make a function that returns step-by-step text.
-    - Plug it into a router or a new keyword.
-
-Example: adding a new "explain" style feature
----------------------------------------------
-1) Create:
-
-    def leg_demo_uit(s):
+STEP A — Create the explanation function
+----------------------------------------
+    def leg_demo_uit(expr_str):
         steps = []
         steps.append("Step 1: This is a demo explanation.")
-        steps.append("Step 2: Input was: " + s)
+        steps.append("Step 2: Input was: " + expr_str)
         return "\n".join(steps)
 
-2) In SemCAS(z):
+STEP B — Add routing logic
+--------------------------
+Inside the "leg ... uit" router:
 
-    if zl.startswith("leg ") and zl.endswith(" uit"):
-        inner = z[4:-4].strip()
-        # For now, route everything to demo:
-        return leg_demo_uit(inner)
+    if is_demo(expr_str):
+        return leg_demo_uit(expr_str)
 
-Later you can replace that routing logic with smarter detection.
+STEP C — (Optional) Add a detector
+----------------------------------
+    def is_demo(expr_str):
+        return "demo" in expr_str
 
-Step 6 — General tips
----------------------
-- Reuse helpers: expr(), pretty(), trig_fix(), etc.
-- Always catch errors where it makes sense and return a friendly message.
-- Keep your function names clear and consistent.
-- Do not rely on global state unless absolutely necessary.
+------------------------------------------------------------
+4. What NOT to do
+------------------------------------------------------------
 
-Summary:
---------
-To add something to SemCAS:
+DO NOT:
+-------
+1. Do NOT modify existing functions unless fixing a bug.
+2. Do NOT merge multiple features into one giant function.
+3. Do NOT hardcode logic inside SemCAS(z) that belongs in a module.
+4. Do NOT return raw SymPy objects — ALWAYS return strings.
+5. Do NOT use print() inside feature functions.
+6. Do NOT use input() anywhere except the REPL.
+7. Do NOT change global variables (ANGLE_MODE is the only exception).
+8. Do NOT break naming conventions (doe_xxx, leg_xxx_uit).
+9. Do NOT delete or rewrite other people's modules.
+10. Do NOT create circular dependencies between features.
 
-1) Write a new function that does the work and returns a string.
-2) Add a new parser rule in SemCAS(z) that detects a keyword and calls your function.
-3) Test it with simple inputs.
-4) Keep it modular so others can add more features without touching yours.
+If you break these rules, your feature may become unmaintainable.
 
-SemCAS is designed so the community can keep stacking features on top
-without waiting for a “next official update”.
+DO:
+---
+1. Add new functions.
+2. Add new parser rules.
+3. Add new detectors.
+4. Add new explanation templates.
+5. Keep everything modular and readable.
+6. Keep everything returning strings.
+7. Keep everything open-source friendly.
+
+------------------------------------------------------------
+5. Minimal Template (copy/paste)
+------------------------------------------------------------
+
+    def doe_newfeature(s):
+        steps = []
+        steps.append("Step 1: ...")
+        steps.append("Step 2: ...")
+        return "\n".join(steps)
+
+    if zl.startswith("newfeature "):
+        return doe_newfeature(z[11:].strip())
+
+------------------------------------------------------------
+6. Credits
+------------------------------------------------------------
+SemCAS was created by Sem.
+All contributors must keep Sem credited as the original author.
+
+------------------------------------------------------------
+7. License
+------------------------------------------------------------
+Use any open-source license you prefer (MIT recommended).
+All contributions must remain open-source.
