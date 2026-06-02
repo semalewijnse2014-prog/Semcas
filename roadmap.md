@@ -2,15 +2,15 @@ SemCAS Roadmap
 
 START
   |
-  |-- 11.1  (Stable release)
+  |-- 11.2 (step by step solutions)
   |
-  |-- 11.2  (Taylor series)
+  |-- 11.3  (Taylor series)
   |
-  |-- 11.3  (cheat sheets)
+  |-- 11.4  (cheat sheets)
   |
-  |-- 11.4  (NumPy support)
+  |-- 11.5  (NumPy support)
   |
-  |-- 11.5  (Plot support)
+  |-- 11.6  (Plot support)
   |
   V
  End
