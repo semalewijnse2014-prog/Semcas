@@ -1,5 +1,10 @@
-SemCAS is a lightweight CAS built in Python, designed to give you the power of SymPy but with a much more human‑friendly command style.
-It understands natural language in both English and Dutch (my native language), making it extremely easy to use even if you're not familiar with strict math syntax. SemCAS runs on Python and SymPy, and supports commands for algebra, calculus, equations, limits, and more. In the included .md file inside the .zip, you can find a full list of supported commands, examples, and explanations of how SemCAS interprets human‑language input.
+SemCAS is a lightweight CAS built in Python, designed to give you the power of SymPy but with a much more human friendly command style.
+It understands natural language in both English and Dutch (my native language), making it extremely easy to use even if you're not familiar with strict math syntax.
+
+SemCAS runs on Python and SymPy, and supports commands for algebra, calculus, equations, limits, and more. 
+
+In the included .md file inside the .zip, you can find a full list of supported commands, examples, and explanations of how SemCAS interprets human language input.
+
 Status: SemCAS 11.2 is currently in development.
 This update includes major new features (explanation modules, language router, code cleanup), so it will take a bit longer to finish.
 The project is active and still being worked on.
