@@ -5,6 +5,4 @@ SemCAS runs on Python and SymPy, and supports commands for algebra, calculus, eq
 
 In the included .md file inside the .zip, you can find a full list of supported commands, examples, and explanations of how SemCAS interprets human language input.
 
-Status: SemCAS 11.2 is currently in development.
-This update includes major new features (explanation modules, language router, code cleanup), so it will take a bit longer to finish.
-The project is active and still being worked on.
+Status: SemCAS is dead, i just do not want to work on it anymore (not that i dit much)
